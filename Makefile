@@ -2,12 +2,13 @@ CC = gcc
 CFLAGS = -Wall -Wextra -Werror
 
 TARGET = db
-SRC = main.c
+SRC = $(wildcard *.c)
+OBJ = $(SRC:.c=.o)
 
-$(TARGET): $(SRC)
-	$(CC) $(CFLAGS) $(SRC) -o $(TARGET)
+$(TARGET): $(OBJ)
+	$(CC) $(CFLAGS) $(OBJ) -o $(TARGET)
 
 clean:
-	rm -f $(TARGET)
+	rm -f $(TARGET) $(OBJ)
 
 .PHONY: clean

@@ -3,6 +3,7 @@ main
 *.exe
 *.out
 db
+*.db
 
 # Object files
 *.o

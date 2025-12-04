@@ -1,5 +1,5 @@
+#include "headers/row.h"
 #include <_stdio.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -37,16 +37,6 @@ void close_input_buffer(InputBuffer *input_buffer) {
   free(input_buffer);
 }
 
-// compiler and virtual machine
-#define COLUMN_USERNAME_SIZE 32
-#define COLUMN_EMAIL_SIZE 255
-
-typedef struct {
-  uint32_t id;
-  char username[COLUMN_USERNAME_SIZE + 1];
-  char email[COLUMN_EMAIL_SIZE + 1];
-} Row;
-
 typedef enum {
   META_COMMAND_SUCCESS,
   META_COMMAND_UNRECOGNIZED_COMMAND
@@ -67,8 +57,10 @@ typedef struct {
   Row row_to_insert;
 } Statement;
 
-MetaCommandResult do_meta_command(InputBuffer *input_buffer) {
+MetaCommandResult do_meta_command(InputBuffer *input_buffer, Table *table) {
   if (strcmp(input_buffer->buffer, ".exit") == 0) {
+    close_input_buffer(input_buffer);
+    db_close(table);
     exit(EXIT_SUCCESS);
   } else {
     return META_COMMAND_UNRECOGNIZED_COMMAND;
@@ -116,14 +108,6 @@ PrepareResult prepare_statement(InputBuffer *input_buffer,
 }
 
 // compact row
-#define size_of_attribute(Struct, Attribute) sizeof(((Struct *)0)->Attribute)
-const uint32_t ID_SIZE = size_of_attribute(Row, id);
-const uint32_t USERNAME_SIZE = size_of_attribute(Row, username);
-const uint32_t EMAIL_SIZE = size_of_attribute(Row, email);
-const uint32_t ID_OFFSET = 0;
-const uint32_t USERNAME_OFFSET = ID_OFFSET + ID_SIZE;
-const uint32_t EMAIL_OFFSET = USERNAME_OFFSET + USERNAME_SIZE;
-const uint32_t ROW_SIZE = ID_SIZE + USERNAME_SIZE + EMAIL_SIZE;
 
 void serialize_row(Row *source, void *destination) {
   memcpy(destination + ID_OFFSET, &(source->id), ID_SIZE);
@@ -135,27 +119,6 @@ void deserialize_row(void *source, Row *destination) {
   memcpy(&(destination->id), source + ID_OFFSET, ID_SIZE);
   memcpy(&(destination->username), source + USERNAME_OFFSET, USERNAME_SIZE);
   memcpy(&(destination->email), source + EMAIL_OFFSET, EMAIL_SIZE);
-}
-
-const uint32_t PAGE_SIZE = 4096;
-#define TABLE_MAX_PAGES 100
-const uint32_t ROWS_PER_PAGE = PAGE_SIZE / ROW_SIZE;
-const uint32_t TABLE_MAX_ROWS = ROWS_PER_PAGE * TABLE_MAX_PAGES;
-
-typedef struct {
-  uint32_t num_rows;
-  void *pages[TABLE_MAX_PAGES];
-} Table;
-
-void *row_slot(Table *table, uint32_t row_num) {
-  uint32_t page_num = row_num / ROWS_PER_PAGE;
-  void *page = table->pages[page_num];
-  if (page == NULL) {
-    page = table->pages[page_num] = malloc(PAGE_SIZE);
-  }
-  uint32_t row_offset = row_num % ROWS_PER_PAGE;
-  uint32_t byte_offset = row_offset * ROW_SIZE;
-  return page + byte_offset;
 }
 
 void print_row(Row *row) {
@@ -195,31 +158,20 @@ ExecuteResult execute_statement(Statement *statement, Table *table) {
   }
 }
 
-Table *new_table() {
-  Table *table = (Table *)malloc(sizeof(Table));
-  table->num_rows = 0;
-  for (uint32_t i = 0; i < TABLE_MAX_PAGES; i++) {
-    table->pages[i] = NULL;
+int main(int argc, char *argv[]) {
+  if (argc < 2) {
+    printf("Must supply a database filename.\n");
+    exit(EXIT_FAILURE);
   }
-  return table;
-}
-
-void free_table(Table *table) {
-  for (int i = 0; table->pages[i]; i++) {
-    free(table->pages[i]);
-  }
-  free(table);
-}
-
-int main() {
-  Table *table = new_table();
+  char *filename = argv[1];
+  Table *table = db_open(filename);
   InputBuffer *input_buffer = new_input_buffer();
   while (1) {
     print_prompt();
     read_input(input_buffer);
 
     if (input_buffer->buffer[0] == '.') {
-      switch (do_meta_command(input_buffer)) {
+      switch (do_meta_command(input_buffer, table)) {
       case (META_COMMAND_SUCCESS):
         continue;
       case (META_COMMAND_UNRECOGNIZED_COMMAND):
