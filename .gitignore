@@ -1,0 +1,37 @@
+# Compiled binary
+main
+*.exe
+*.out
+
+# Object files
+*.o
+
+# Dependency files
+*.d
+
+# Build directories (if you create one later)
+build/
+bin/
+
+# Backup / temporary files
+*.swp
+*.swo
+*~
+*.tmp
+
+# macOS metadata
+.DS_Store
+
+# clangd / ccls indexing
+.cache/
+clangd/
+compile_commands.json
+
+# VSCode
+.vscode/
+
+# CLion / JetBrains
+.idea/
+
+# Makefile auto backups
+Makefile.bak
