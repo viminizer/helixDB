@@ -21,7 +21,7 @@ extern const uint32_t ROWS_PER_PAGE;
 extern const uint32_t TABLE_MAX_ROWS;
 
 extern const uint32_t NODE_TYPE_SIZE;
-extern const uint32_t NODE_TYPE_OFFSE;
+extern const uint32_t NODE_TYPE_OFFSET;
 extern const uint32_t IS_ROOT_SIZE;
 extern const uint32_t IS_ROOT_OFFSET;
 extern const uint32_t PARENT_POINTER_SIZE;

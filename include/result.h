@@ -18,6 +18,7 @@ typedef enum {
 typedef enum {
   EXECUTE_SUCCESS,
   EXECUTE_TABLE_FULL,
+  EXECUTE_DUPLICATE_KEY
 } ExecuteResult;
 
 int handle_prepare_result(PrepareResult result, InputBuffer *input_buffer);
