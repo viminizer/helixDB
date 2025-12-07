@@ -42,6 +42,8 @@ extern const uint32_t LEAF_NODE_MAX_CELLS;
 
 extern const uint32_t LEAF_NODE_RIGHT_SPLIT_COUNT;
 extern const uint32_t LEAF_NODE_LEFT_SPLIT_COUNT;
+extern const uint32_t LEAF_NODE_NEXT_LEAF_SIZE;
+extern const uint32_t LEAF_NODE_NEXT_LEAF_OFFSET;
 
 /*
  * Internal Node Header Layout
