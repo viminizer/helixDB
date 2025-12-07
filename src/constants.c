@@ -62,6 +62,7 @@ const uint32_t LEAF_NODE_LEFT_SPLIT_COUNT =
 /*
  * Internal Node Header Layout
  */
+const uint32_t INTERNAL_NODE_MAX_CELLS = 3;
 const uint32_t INTERNAL_NODE_NUM_KEYS_SIZE = sizeof(uint32_t);
 const uint32_t INTERNAL_NODE_NUM_KEYS_OFFSET = COMMON_NODE_HEADER_SIZE;
 const uint32_t INTERNAL_NODE_RIGHT_CHILD_SIZE = sizeof(uint32_t);

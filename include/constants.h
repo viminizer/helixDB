@@ -53,6 +53,7 @@ extern const uint32_t INTERNAL_NODE_NUM_KEYS_OFFSET;
 extern const uint32_t INTERNAL_NODE_RIGHT_CHILD_SIZE;
 extern const uint32_t INTERNAL_NODE_RIGHT_CHILD_OFFSET;
 extern const uint32_t INTERNAL_NODE_HEADER_SIZE;
+extern const uint32_t INTERNAL_NODE_MAX_CELLS;
 
 /*
  * Internal Node Body Layout
